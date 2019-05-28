@@ -37,7 +37,7 @@ app.use('/api', api);
 // TEST ENDPOINT
 app.get('/', (req,res) => {
     res.send({
-        express: 'TEST RESPONSE'
+        express: 'UPDATE GIT EMAIL'
     })
 })
 
