@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const PORT = process.env.PORT || 5000
 
-const accounts = require('./routes/api/accounts')
+const api = require('./routes/api')
 
 //DB Config
 const db = process.env.DB_URI
@@ -29,11 +29,11 @@ app.use(bodyParser.json());
 
 
 //User Routes
-app.use('/api/accounts', accounts);
+app.use('/api', api);
 
 app.get('/', (req,res) => {
     res.send({
-        express: 'BACKEND REACTSSasdSS'
+        express: 'TEST RESPONSE'
     })
 })
 
