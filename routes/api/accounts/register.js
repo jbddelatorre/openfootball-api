@@ -2,13 +2,10 @@ const { HttpStatus, router } = require('../base_imports')
 
 const bcrypt = require('bcryptjs')
 
-//Load User Model
-const User = require('../../../models/User');
-
-router.post('/', async (req, res) => {
-    
+module.exports = async (req, res) => {
     try {
-        const checkUser = await User.findOne({ email: req.body.email })
+        const checkUser = await global.db.accounts.users.findOne({ email: req.body.email })
+
         if(checkUser){
             return res.json({
                 status: HttpStatus.BAD_REQUEST,
@@ -16,28 +13,39 @@ router.post('/', async (req, res) => {
                 body: {}
             })
         } else {
-            const newUser = new User({
+            const newUser = {
                 name: req.body.name,
                 email: req.body.email,
                 password: req.body.password
-            });
+            }
+            
             bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(newUser.password, salt, (err, hash) => {
+                bcrypt.hash(newUser.password, salt, async (err, hash) => {
                     if (err) throw err;
+
                     newUser.password = hash;
-                    newUser
-                        .save()
-                        .then(user => res.json(user))
-                        .catch(err => console.log(err));
+
+                    let user = await global.db.accounts.users.create(newUser)
+
+                    return res.json({
+                        status: HttpStatus.OK,
+                        message: 'Registration success',
+                        body: {
+                            id: user.id,
+                            name: user.name,
+                            email: user.email
+                        }
+                    })
                 })
             })
         }
 
     } catch(e) {
-        res.status(404).json({
-            'error': 'INVALID_REQUEST'
+        res.json({
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Database check failed',
+            body: {}
         })
     }
-})
+}
 
-module.exports = router
